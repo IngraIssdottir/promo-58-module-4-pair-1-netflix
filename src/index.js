@@ -17,6 +17,16 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
+async function getConnection() {
+  const connection = await mysql.createConnection({
+    host: 'localhost',
+    port: 3306, // hay que cambiar el port al port de la base de datos
+    database: 'netflix',
+    user: 'root',
+    password: process.env.MYSQL_PASSWORD,
+  });
+  return connection;
+};
 
 //ENDPOINT
 
@@ -25,34 +35,44 @@ server.get("/", (req, res) => {
 });
 
 server.get('/api/movies', async (req, res) => {
-  //Esta función tiene que estar fuera del get, debajo del serverPort
-  async function getConnection() {
-  const connection = await mysql.createConnection({
-    host: 'localhost',
-    port: 4000, // hay que cambiar el port al port de la base de datos
-    database: 'netflix',
-    user: 'root',
-    password: process.env.MYSQL_PASSWORD,
+  const conn = await getConnection();
+  let selectMovies;
+  if (req.query.genre) {
+    selectMovies = `
+      SELECT *
+        FROM movies
+        WHERE genre = ?
+        ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"};`;
+  } else {
+    selectMovies = `
+      SELECT *
+        FROM movies
+        ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"};`;
+  }
+   const [results] = await conn.query(selectMovies, [req.query.genre]);
+   await conn.end();
+    res.json({
+    success: true,
+    movies: results,
   });
-  await connection.connect();
 
   console.log(
     `Conexión establecida con la base de datos (identificador=${connection.threadId})`
-  );
+);
 
-  return connection;
-}
-  console.log('Pidiendo a la base de datos de pelis.');
+  
+})
+  /*console.log('Pidiendo a la base de datos de pelis.');
   let sql = `SELECT * FROM movies`;
 
   const connection = await getConnection();
   const [results, fields] = await connection.query(sql);
   res.json(results);
-  connection.end();
+  connection.end();*/
 
 
 
-});
+};
 
 
 /*async function getConnection() {
