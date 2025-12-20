@@ -18,14 +18,14 @@ server.listen(serverPort, () => {
 });
 
 async function getConnection() {
-  const connection = await mysql.createConnection({
+  const conn = await mysql.createConnection({
     host: 'localhost',
     port: 3306, // hay que cambiar el port al port de la base de datos
     database: 'netflix',
     user: 'root',
     password: process.env.MYSQL_PASSWORD,
   });
-  return connection;
+  return conn;
 };
 
 //ENDPOINT
@@ -36,6 +36,8 @@ server.get("/", (req, res) => {
 
 server.get('/api/movies', async (req, res) => {
   const conn = await getConnection();
+
+
   let selectMovies;
   if (req.query.genre) {
     selectMovies = `
@@ -49,30 +51,35 @@ server.get('/api/movies', async (req, res) => {
         FROM movies
         ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"};`;
   }
-   const [results] = await conn.query(selectMovies, [req.query.genre]);
+   
+  
+  const [results] = await conn.query(selectMovies, [req.query.genre]);
+   
+   
    await conn.end();
     res.json({
     success: true,
     movies: results,
+    
   });
 
   console.log(
-    `Conexión establecida con la base de datos (identificador=${connection.threadId})`
+    `Conexión establecida con la base de datos (identificador=${conn.threadId})`
 );
-
+});
   
-})
-  /*console.log('Pidiendo a la base de datos de pelis.');
+/*})
+  console.log('Pidiendo a la base de datos de pelis.');
   let sql = `SELECT * FROM movies`;
 
   const connection = await getConnection();
   const [results, fields] = await connection.query(sql);
   res.json(results);
-  connection.end();*/
+  connection.end();
 
 
 
-};
+};*/
 
 
 /*async function getConnection() {
