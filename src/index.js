@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 //esto tiene que estar en la primera línea para que funcione el .env
 // y hay que instalarlo npm install dotenv
 
@@ -19,14 +19,14 @@ server.listen(serverPort, () => {
 
 async function getConnection() {
   const conn = await mysql.createConnection({
-    host: 'localhost',
+    host: "localhost",
     port: 3306, // hay que cambiar el port al port de la base de datos
-    database: 'netflix',
-    user: 'root',
+    database: "netflix",
+    user: "root",
     password: process.env.MYSQL_PASSWORD,
   });
   return conn;
-};
+}
 
 //ENDPOINT
 
@@ -34,41 +34,37 @@ server.get("/", (req, res) => {
   res.send("Hola Adalabers!");
 });
 
-server.get('/api/movies', async (req, res) => {
+server.get("/api/movies", async (req, res) => {
   const conn = await getConnection();
 
+  let sql = "";
+  let params = [];
 
-  let selectMovies;
   if (req.query.genre) {
-    selectMovies = `
+    sql = `
       SELECT *
-        FROM movies
-        WHERE genre = ?
-        ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"};`;
+      FROM movies
+      WHERE genre = ?
+      ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"}
+    `;
+    params.push(req.query.genre);
   } else {
-    selectMovies = `
+    sql = `
       SELECT *
-        FROM movies
-        ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"};`;
+      FROM movies
+      ORDER BY title ${req.query.sort === "DESC" ? "DESC" : "ASC"}
+    `;
   }
-   
-  
-  const [results] = await conn.query(selectMovies, [req.query.genre]);
-   
-   
-   await conn.end();
-    res.json({
+
+  const [results] = await conn.query(sql, params);
+  await conn.end();
+
+  res.json({
     success: true,
     movies: results,
-    
   });
 
-  console.log(
-    `Conexión establecida con la base de datos (identificador=${conn.threadId})`
-);
-});
-  
-/*})
+  /*})
   console.log('Pidiendo a la base de datos de pelis.');
   let sql = `SELECT * FROM movies`;
 
@@ -81,8 +77,7 @@ server.get('/api/movies', async (req, res) => {
 
 };*/
 
-
-/*async function getConnection() {
+  /*async function getConnection() {
   const connection = await mysql.createConnection({
     host: 'localhost',
     port: 4000,
@@ -99,7 +94,7 @@ server.get('/api/movies', async (req, res) => {
   return connection;
 }*/
 
-const fakeMovies = [
+  /*const fakeMovies = [
   {
     id: 1,
     title: "Wonder Woman",
@@ -128,7 +123,7 @@ server.get("/api/movies", (req, res) => {
   res.json({
     success: true,
     movies: fakeMovies,
-  });
+  });*/
 
   // Devolvemos el array de objetos con los datos de animes
 

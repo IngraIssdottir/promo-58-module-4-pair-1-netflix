@@ -26,7 +26,7 @@ const App = () => {
   // state: movies
   const [appMovies, setAppMovies] = useState([]);
   const [allMoviesOptionGenre, setAllMoviesOptionGenre] = useState("");
-  const [allMoviesOptionSort, setAllMoviesOptionSort] = useState("asc");
+  const [allMoviesOptionSort, setAllMoviesOptionSort] = useState("ASC");
 
   /*
   useEffect: obtener las películas del API.
@@ -39,7 +39,7 @@ const App = () => {
       sort: allMoviesOptionSort,
     };
     apiMovies.getMoviesFromApi(params).then((response) => {
-      setAppMovies(response.movies);
+      setAppMovies(response);
     });
   }, [allMoviesOptionGenre, allMoviesOptionSort]);
 
